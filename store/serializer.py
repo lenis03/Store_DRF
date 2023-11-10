@@ -17,10 +17,6 @@ class ProductSerializer(serializers.ModelSerializer):
         source='unit_price'
         )
     unit_price_after_tax = serializers.SerializerMethodField()
-    category = serializers.HyperlinkedRelatedField(
-        queryset=Category.objects.all(),
-        view_name='store:category_detail',
-    )
 
     class Meta:
         model = Product
@@ -29,9 +25,15 @@ class ProductSerializer(serializers.ModelSerializer):
             'title',
             'price',
             'unit_price_after_tax',
-            'inventory',
             'category'
             ]
 
     def get_unit_price_after_tax(self, product: Product):
         return round(product.unit_price * Decimal(1.09), 2)
+
+    def validate(self, data):
+        if len(data['name']) < 6:
+            raise serializers.ValidationError(
+                'Product title length should be at least 6'
+                )
+        return data
