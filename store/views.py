@@ -6,15 +6,22 @@ from . serializer import CategorySerializer, ProductSerializer
 from .models import Category, Product
 
 
-@api_view()
+@api_view(['GET', 'POST'])
 def product_list(request):
-    products_queryset = Product.objects.select_related('category').all()
-    serializer = ProductSerializer(
-        products_queryset,
-        many=True,
-        context={'request': request}
-        )
-    return Response(serializer.data)
+    if request.method == 'GET':
+        products_queryset = Product.objects.select_related('category').all()
+        serializer = ProductSerializer(
+            products_queryset,
+            many=True,
+            context={'request': request}
+            )
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = ProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response('Everything Ok')
 
 
 @api_view()
