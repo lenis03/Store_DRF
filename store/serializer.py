@@ -23,9 +23,12 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
+            'slug',
             'price',
             'unit_price_after_tax',
-            'category'
+            'category',
+            'inventory',
+            'description',
             ]
 
     def get_unit_price_after_tax(self, product: Product):
