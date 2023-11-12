@@ -54,9 +54,21 @@ def product_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(['GET'])
+def category_list(request):
+    if request.method == 'GET':
+        category = Category.objects.prefetch_related('products').all()
+        serializer = CategorySerializer(category, many=True)
+        return Response(serializer.data)
+
+
 @api_view()
 def category_detail(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+    category = get_object_or_404(
+        Category.objects.prefetch_related(
+            'products'
+            ),
+        pk=pk)
     serializer = CategorySerializer(category)
 
     return Response(serializer.data)
