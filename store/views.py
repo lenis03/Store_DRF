@@ -22,7 +22,7 @@ def product_list(request):
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response('Everything Ok')
+        return Response('Product create successfully.')
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -54,12 +54,18 @@ def product_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def category_list(request):
     if request.method == 'GET':
         category = Category.objects.prefetch_related('products').all()
         serializer = CategorySerializer(category, many=True)
         return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = CategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response('Category create successfully.')
 
 
 @api_view()
