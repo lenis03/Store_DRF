@@ -68,13 +68,20 @@ def category_list(request):
         return Response('Category create successfully.')
 
 
-@api_view()
+@api_view(['GET', 'PUT'])
 def category_detail(request, pk):
     category = get_object_or_404(
         Category.objects.prefetch_related(
             'products'
             ),
         pk=pk)
-    serializer = CategorySerializer(category)
+    if request.method == 'GET':
+        serializer = CategorySerializer(category)
+        return Response(serializer.data)
 
-    return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CategorySerializer(instance=category, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
