@@ -68,7 +68,7 @@ def category_list(request):
         return Response('Category create successfully.')
 
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def category_detail(request, pk):
     category = get_object_or_404(
         Category.objects.prefetch_related(
@@ -85,3 +85,12 @@ def category_detail(request, pk):
         serializer.save()
         return Response(serializer.data)
 
+    elif request.method == 'DELETE':
+        if category.products.count() > 0:
+            return Response({
+                'error':
+                'There are a number of products that subset this category,'
+                'Please remove them first.'
+                })
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
