@@ -5,9 +5,22 @@ from rest_framework import serializers
 from .models import Category, Product
 
 
-class CategorySerializer(serializers.Serializer):
-    title = serializers.CharField(max_length=255)
-    description = serializers.CharField(max_length=255)
+class CategorySerializer(serializers.ModelSerializer):
+    number_of_product = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Category
+        fields = ['id', 'title', 'description', 'number_of_product']
+
+    def get_number_of_product(self, category: Category):
+        return category.products_count
+
+    def validate(self, data):
+        if len(data['title']) < 3:
+            raise serializers.ValidationError(
+                'Category title length should be at least 3.'
+                )
+        return data
 
 
 class ProductSerializer(serializers.ModelSerializer):
