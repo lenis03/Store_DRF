@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -22,7 +23,7 @@ def product_list(request):
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response('Product create successfully.')
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -57,23 +58,24 @@ def product_detail(request, pk):
 @api_view(['GET', 'POST'])
 def category_list(request):
     if request.method == 'GET':
-        category = Category.objects.prefetch_related('products').all()
-        serializer = CategorySerializer(category, many=True)
+        categories_queryset = Category\
+            .objects\
+            .annotate(products_count=Count('products')).all()
+        serializer = CategorySerializer(categories_queryset, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
         serializer = CategorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response('Category create successfully.')
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def category_detail(request, pk):
     category = get_object_or_404(
-        Category.objects.prefetch_related(
-            'products'
-            ),
+        Category.objects.annotate(
+            products_count=Count('products')),
         pk=pk)
     if request.method == 'GET':
         serializer = CategorySerializer(category)
@@ -91,6 +93,6 @@ def category_detail(request, pk):
                 'error':
                 'There are a number of products that subset this category,'
                 'Please remove them first.'
-                })
+                }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
