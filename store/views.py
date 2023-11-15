@@ -46,19 +46,9 @@ class ProductDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CategoryList(APIView):
-    def get(self, request):
-        categories_queryset = Category\
-            .objects\
-            .prefetch_related('products').all()
-        serializer = CategorySerializer(categories_queryset, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+class CategoryList(ListCreateAPIView):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.prefetch_related('products').all()
 
 
 class CategoryDetail(APIView):
