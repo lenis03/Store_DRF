@@ -6,14 +6,11 @@ from .models import Category, Product
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    number_of_product = serializers.SerializerMethodField()
+    number_of_product = serializers.IntegerField(source='products.count', read_only=True)
 
     class Meta:
         model = Category
         fields = ['id', 'title', 'description', 'number_of_product']
-
-    def get_number_of_product(self, category: Category):
-        return category.products.count()
 
     def validate(self, data):
         if len(data['title']) < 3:
