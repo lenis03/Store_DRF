@@ -37,30 +37,20 @@ class CategoryList(ListCreateAPIView):
     queryset = Category.objects.prefetch_related('products').all()
 
 
-class CategoryDetail(APIView):
-    def setup(self, request, *args, **kwargs):
-        self.category = get_object_or_404(
+class CategoryDetail(RetrieveUpdateDestroyAPIView):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.prefetch_related('products').all()
+
+    def delete(self, request, pk):
+        category = get_object_or_404(
             Category.objects.prefetch_related('products'),
-            pk=kwargs['pk'])
-
-        return super().setup(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        serializer = CategorySerializer(self.category)
-        return Response(serializer.data)
-
-    def put(self, request, *args, **kwargs):
-        serializer = CategorySerializer(instance=self.category, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def delete(self, request, *args, **kwargs):
-        if self.category.products.count() > 0:
+            pk=pk
+            )
+        if category.products.count() > 0:
             return Response({
                 'error':
                 'There are a number of products that subset this category,'
                 'Please remove them first.'
                 }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        self.category.delete()
+        category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
