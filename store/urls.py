@@ -5,8 +5,8 @@ from store import views
 app_name = 'store'
 
 urlpatterns = [
-    path('products/', views.product_list, name='product_list'),
-    path('products/<int:pk>/', views.product_detail, name='product_detail'),
-    path('categories/', views.category_list, name='category_list'),
-    path('categories/<int:pk>/', views.category_detail, name='category_detail'),
+    path('products/', views.ProductList.as_view(), name='product_list'),
+    path('products/<int:pk>/', views.ProductDetail.as_view(), name='product_detail'),
+    path('categories/', views.CategoryList.as_view(), name='category_list'),
+    path('categories/<int:pk>/', views.CategoryDetail.as_view(), name='category_detail'),
 ]
