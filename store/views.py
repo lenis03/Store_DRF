@@ -1,29 +1,19 @@
-from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView
 
 from . serializer import CategorySerializer, ProductSerializer
 from .models import Category, Product
 
 
-class ProductList(APIView):
-    def get(self, request):
-        products_queryset = Product.objects.select_related('category').all()
-        serializer = ProductSerializer(
-            products_queryset,
-            many=True,
-            context={'request': request}
-            )
-        return Response(serializer.data)
+class ProductList(ListCreateAPIView):
+    serializer_class = ProductSerializer
+    queryset = Product.objects.select_related('category').all()
 
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def get_serializer_context(self):
+        return {'request': self.request}
 
 
 class ProductDetail(APIView):
