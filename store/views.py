@@ -4,8 +4,8 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from . serializer import CategorySerializer, ProductSerializer
-from .models import Category, Product
+from . serializer import CategorySerializer, ProductSerializer, CommentSerializer
+from .models import Category, Comment, Product
 
 
 class ProductViewSet(ModelViewSet):
@@ -47,3 +47,11 @@ class CategoryViewSet(ModelViewSet):
                 }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         category.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CommentViewSet(ModelViewSet):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        product_pk = self.kwargs['product_pk']
+        return Comment.objects.filter(product_id=product_pk).all()
