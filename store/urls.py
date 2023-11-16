@@ -1,17 +1,29 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from rest_framework_nested import routers
 
 from store import views
 
 app_name = 'store'
 
-router = DefaultRouter()
+router = routers.DefaultRouter()
 
 router.register('products', views.ProductViewSet)
 router.register('categories', views.CategoryViewSet)
 
-# urlpatterns = router.urls
+products_router = routers.NestedDefaultRouter(
+    router,
+    'products',
+    lookup='product'
+    )
+
+products_router.register(
+    'comments',
+    views.CommentViewSet,
+    basename='product-comments'
+    )
+
+# urlpatterns = router.urls + products_router.urls
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', include(router.urls + products_router.urls)),
 ]
