@@ -30,16 +30,11 @@ class ProductViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CategoryList(ListCreateAPIView):
+class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.prefetch_related('products').all()
 
-
-class CategoryDetail(RetrieveUpdateDestroyAPIView):
-    serializer_class = CategorySerializer
-    queryset = Category.objects.prefetch_related('products').all()
-
-    def delete(self, request, pk):
+    def destroy(self, request, pk):
         category = get_object_or_404(
             Category.objects.prefetch_related('products'),
             pk=pk
