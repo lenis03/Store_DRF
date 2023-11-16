@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cb792c7ba692383a45cc2c47324df4f18b276032914524cfbc72bc6c9513ce95"
+            "sha256": "3f8f5e8dae1de5bef57b30df70194a212d5baa7f265cd5c5c71cda1a6fcc7f9c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -51,6 +51,15 @@
             "markers": "python_version >= '3.6'",
             "version": "==3.14.0"
         },
+        "drf-nested-routers": {
+            "hashes": [
+                "sha256:01aa556b8c08608bb74fb34f6ca065a5183f2cda4dc0478192cc17a2581d71b0",
+                "sha256:996b77f3f4dfaf64569e7b8f04e3919945f90f95366838ca5b8bed9dd709d6c5"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.5'",
+            "version": "==0.93.4"
+        },
         "factory-boy": {
             "hashes": [
                 "sha256:a2cdbdb63228177aa4f1c52f4b6d83fab2b8623bf602c7dedd7eb83c0f69c04c",
@@ -62,12 +71,12 @@
         },
         "faker": {
             "hashes": [
-                "sha256:14ccb0aec342d33aa3889a864a56e5b3c2d56bce1b89f9189f4fbc128b9afc1e",
-                "sha256:da880a76322db7a879c848a0771e129338e0a680a9f695fd9a3e7a6ac82b45e1"
+                "sha256:88316cfa7c8be892433bb10b2f1c2a7ce97246e18712680547e2fb1c4bd03912",
+                "sha256:f9af61c9223e1a3fd01ee2a48265352432f40a4fb21feb274d9d1d97b4943d75"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==19.13.0"
+            "version": "==20.0.3"
         },
         "mysqlclient": {
             "hashes": [
