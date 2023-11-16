@@ -1,27 +1,25 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
 from . serializer import CategorySerializer, ProductSerializer
 from .models import Category, Product
 
 
-class ProductList(ListCreateAPIView):
+class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.select_related('category').all()
 
     def get_serializer_context(self):
         return {'request': self.request}
 
-
-class ProductDetail(RetrieveUpdateDestroyAPIView):
-    serializer_class = ProductSerializer
-    queryset = Product.objects.select_related('category').all()
-
-    def delete(self, request, pk):
-        product = get_object_or_404(Product.objects.select_related('category'),pk=pk)
+    def destroy(self, request, pk):
+        product = get_object_or_404(
+            Product.objects.select_related('category'),
+            pk=pk
+            )
         if product.order_items.count() > 0:
             return Response({
                 'error':
