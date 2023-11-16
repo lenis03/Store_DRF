@@ -1,12 +1,17 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from store import views
 
 app_name = 'store'
 
+router = DefaultRouter()
+
+router.register('products', views.ProductViewSet)
+router.register('categories', views.CategoryViewSet)
+
+# urlpatterns = router.urls
+
 urlpatterns = [
-    path('products/', views.ProductList.as_view(), name='product_list'),
-    path('products/<int:pk>/', views.ProductDetail.as_view(), name='product_detail'),
-    path('categories/', views.CategoryList.as_view(), name='category_list'),
-    path('categories/<int:pk>/', views.CategoryDetail.as_view(), name='category_detail'),
+    path('', include(router.urls)),
 ]
