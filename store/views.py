@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 
 from . serializer import CategorySerializer, ProductSerializer, CommentSerializer
 from .models import Category, Comment, Product
@@ -10,13 +11,9 @@ from .models import Category, Comment, Product
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
-
-    def get_queryset(self):
-        queryset = Product.objects.all()
-        catergory_id_parameter = self.request.query_params.get('category_id')
-        if catergory_id_parameter is not None:
-            queryset = queryset.filter(category_id=catergory_id_parameter)
-        return queryset
+    queryset = Product.objects.select_related('category').all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category_id', 'inventory']
 
     def get_serializer_context(self):
         return {'request': self.request}
