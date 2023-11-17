@@ -10,7 +10,13 @@ from .models import Category, Comment, Product
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
-    queryset = Product.objects.select_related('category').all()
+
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        catergory_id_parameter = self.request.query_params.get('category_id')
+        if catergory_id_parameter is not None:
+            queryset = queryset.filter(category_id=catergory_id_parameter)
+        return queryset
 
     def get_serializer_context(self):
         return {'request': self.request}
