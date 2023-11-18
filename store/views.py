@@ -1,11 +1,11 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
+from .paginations import DefaultPagination
 from .filters import ProductFilter
 from .serializer import CategorySerializer, ProductSerializer, CommentSerializer
 from .models import Category, Comment, Product
@@ -19,6 +19,8 @@ class ProductViewSet(ModelViewSet):
     filterset_class = ProductFilter
     ordering_fields = ['name', 'unit_price', 'inventory']
     search_fields = ['name', 'category__title']
+    pagination_class = DefaultPagination
+    ordering = ['id']
 
     def get_serializer_context(self):
         return {'request': self.request}
