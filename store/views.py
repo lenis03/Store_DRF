@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
-from . serializer import CategorySerializer, ProductSerializer, CommentSerializer
+from .filters import ProductFilter
+from .serializer import CategorySerializer, ProductSerializer, CommentSerializer
 from .models import Category, Comment, Product
 
 
@@ -13,7 +14,8 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.select_related('category').all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['category_id', 'inventory']
+    # filterset_fields = ['category_id', 'inventory']
+    filterset_class = ProductFilter
 
     def get_serializer_context(self):
         return {'request': self.request}
