@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.filters import OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .filters import ProductFilter
@@ -14,10 +14,11 @@ from .models import Category, Comment, Product
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.select_related('category').all()
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
     # filterset_fields = ['category_id', 'inventory']
     filterset_class = ProductFilter
     ordering_fields = ['name', 'unit_price', 'inventory']
+    search_fields = ['name', 'category__title']
 
     def get_serializer_context(self):
         return {'request': self.request}
