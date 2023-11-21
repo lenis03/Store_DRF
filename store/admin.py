@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.http import urlencode
 
-from store.models import Category, Comment, Customer, Order, OrderItem, Product
+from .models import Cart, Category, Comment, Customer, Order, OrderItem, Product
 
 
 class InventoryFilter(admin.SimpleListFilter):
@@ -151,6 +151,12 @@ class OrderItemAdmin(admin.ModelAdmin):
                     ]
     list_per_page = 10
     autocomplete_fields = ['product']
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['id', 'created_at']
+
 
 
 admin.site.register(Category)
