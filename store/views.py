@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import GenericViewSet
 
 from .paginations import DefaultPagination
 from .filters import ProductFilter
@@ -70,7 +72,8 @@ class CommentViewSet(ModelViewSet):
         return {'product_pk': self.kwargs['product_pk']}
 
 
-class CartViewSet(ModelViewSet):
+class CartViewSet(CreateModelMixin,
+                  RetrieveModelMixin,
+                  GenericViewSet):
     serializer_class = CartSerializer
     queryset = Cart.objects.all()
-    
