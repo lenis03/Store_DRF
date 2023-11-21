@@ -74,6 +74,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Cart
-        fields = ['id', 'created_at']
+        fields = ['id']
+        read_only_fields = ['id']
