@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.http import urlencode
 
-from .models import Cart, Category, Comment, Customer, Order, OrderItem, Product
+from .models import Cart, CartItem, Category, Comment, Customer, Order, OrderItem, Product
 
 
 class InventoryFilter(admin.SimpleListFilter):
@@ -153,10 +153,18 @@ class OrderItemAdmin(admin.ModelAdmin):
     autocomplete_fields = ['product']
 
 
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    fields = ['cart', 'product', 'quantity']
+    extra = 0
+    min_num = 1
+    max_num = 10
+
+
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
     list_display = ['id', 'created_at']
-
+    inlines = [CartItemInline]
 
 
 admin.site.register(Category)
