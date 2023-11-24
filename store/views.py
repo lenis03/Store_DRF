@@ -9,7 +9,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from .paginations import DefaultPagination
 from .filters import ProductFilter
-from .serializer import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ProductSerializer, CommentSerializer
+from .serializer import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
 from .models import Cart, CartItem, Category, Comment, Product
 
 
@@ -84,6 +84,8 @@ class CartItemViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return AddCartItemSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCartItemSerializer
         return CartItemSerializer
 
     def get_serializer_context(self):
