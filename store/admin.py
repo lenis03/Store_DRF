@@ -138,8 +138,17 @@ class CommentAdmin(admin.ModelAdmin):
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ['first_name', 'last_name', 'email', 'phone_number']
     list_per_page = 10
-    ordering = ['last_name', 'first_name']
+    ordering = ['user__last_name', 'user__first_name']
     search_fields = ['first_name__istartswith', 'last_name__istartswith']
+
+    def first_name(self, customer: Customer):
+        return customer.user.first_name
+
+    def last_name(self, customer: Customer):
+        return customer.user.last_name
+
+    def email(self, customer: Customer):
+        return customer.user.email
 
 
 @admin.register(OrderItem)
