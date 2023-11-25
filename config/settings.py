@@ -143,3 +143,7 @@ REST_FRAMEWORK = {
     # 'PAGE_SIZE': 10,
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 }
+
+# Config CustomUser
+
+AUTH_USER_MODEL = 'core.CustomUser'
