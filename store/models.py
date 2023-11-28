@@ -47,6 +47,11 @@ class Customer(models.Model):
     phone_number = models.CharField(max_length=255)
     birth_date = models.DateField(null=True, blank=True)
 
+    class Meta:
+        permissions = [
+            ('send_private_email', 'Can send private email to user bye the button')
+        ]
+
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
 
