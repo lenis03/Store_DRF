@@ -154,6 +154,14 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT', ),
 }
 
+# Djoser config
+
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'core.serializers.UserCreateSerializer',
+    }
+}
+
 # Config CustomUser
 
 AUTH_USER_MODEL = 'core.CustomUser'
