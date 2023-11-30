@@ -9,8 +9,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from .paginations import DefaultPagination
 from .filters import ProductFilter
-from .serializer import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
-from .models import Cart, CartItem, Category, Comment, Product
+from .serializer import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CustomerSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
+from .models import Cart, CartItem, Category, Comment, Customer, Product
 
 
 class ProductViewSet(ModelViewSet):
@@ -100,3 +100,8 @@ class CartViewSet(CreateModelMixin,
     serializer_class = CartSerializer
     queryset = Cart.objects.prefetch_related('items__product').all()
     lookup_value_regex = '[0-9a-fA-F]{8}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{4}\-?[0-9a-fA-F]{12}'
+
+
+class CustomerViewSet(ModelViewSet):
+    serializer_class = CustomerSerializer
+    queryset = Customer.objects.all()
