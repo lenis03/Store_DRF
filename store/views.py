@@ -6,6 +6,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.decorators import action
 
 from .paginations import DefaultPagination
 from .filters import ProductFilter
@@ -105,3 +106,10 @@ class CartViewSet(CreateModelMixin,
 class CustomerViewSet(ModelViewSet):
     serializer_class = CustomerSerializer
     queryset = Customer.objects.all()
+
+    @action(detail=False)
+    def me(self, request):
+        user_id = request.user.id
+        customer = Customer.objects.get(user_id=user_id)
+        serializer = CustomerSerializer(customer)
+        return Response(serializer.data)
