@@ -26,6 +26,7 @@ class ProductViewSet(ModelViewSet):
     search_fields = ['name', 'category__title']
     pagination_class = DefaultPagination
     ordering = ['id']
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_context(self):
         return {'request': self.request}
