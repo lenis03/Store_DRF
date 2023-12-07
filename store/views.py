@@ -13,7 +13,7 @@ from .paginations import DefaultPagination
 from .filters import ProductFilter
 from .serializer import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CustomerSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
 from .models import Cart, CartItem, Category, Comment, Customer, Product
-from .permissions import IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
+from .permissions import IsAdminOrCreateAndRetrieve, IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
 
 
 class ProductViewSet(ModelViewSet):
@@ -68,10 +68,13 @@ class CategoryViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
+    permission_classes = [IsAdminOrCreateAndRetrieve]
 
     def get_queryset(self):
         product_pk = self.kwargs['product_pk']
-        return Comment.objects.filter(product_id=product_pk).all()
+        return Comment.objects.filter(
+            status=Comment.COMMENT_STATUS_APPROVED,
+            product_id=product_pk).all()
 
     def get_serializer_context(self):
         return {'product_pk': self.kwargs['product_pk']}
