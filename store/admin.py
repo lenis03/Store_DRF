@@ -132,6 +132,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_editable = ['status']
     ordering = ['-datetime_created']
     autocomplete_fields = ['product']
+    search_fields = ['id']
 
 
 @admin.register(Customer)
