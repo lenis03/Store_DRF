@@ -1,3 +1,4 @@
+import copy
 from rest_framework import permissions
 
 CREATE_RETRIEVE_METHOD = ('GET', 'POST')
@@ -27,3 +28,9 @@ class IsAdminOrCreateAndRetrieve(permissions.BasePermission):
             request.method in CREATE_RETRIEVE_METHOD
             or
             (request.user and request.user.is_staff))
+
+
+class CustomDjangoModelPermissions(permissions.DjangoModelPermissions):
+    def __init__(self):
+        self.perms_map = copy.deepcopy(self.perms_map)
+        self.perms_map['GET'] = ['%(app_label)s.view_%(model_name)s']
