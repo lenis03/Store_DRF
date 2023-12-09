@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import action
@@ -10,10 +11,10 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
 
 from .filters import ProductFilter
-from .models import Cart, CartItem, Category, Comment, Customer, Product
+from .models import Cart, CartItem, Category, Comment, Customer, Order, OrderItem, Product
 from .paginations import DefaultPagination
 from .permissions import IsAdminOrCreateAndRetrieve, IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
-from .serializer import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CustomerSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
+from .serializer import AddCartItemSerializer, CartItemSerializer, CartSerializer, CategorySerializer, CustomerSerializer, OrderSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
 
 
 class ProductViewSet(ModelViewSet):
@@ -131,3 +132,15 @@ class CustomerViewSet(ModelViewSet):
     @action(detail=True, permission_classes=[SendPrivateEmailToCustomerPermission])
     def send_private_email(self, request, pk):
         return Response(f'Sending private email to customer {pk=}')
+
+
+class OrderViewSet(ModelViewSet):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.prefetch_related(
+            Prefetch(
+                'items',
+                queryset=OrderItem.objects.select_related('product')
+            )
+        ).all()
