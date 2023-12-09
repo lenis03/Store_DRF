@@ -145,6 +145,16 @@ class CustomerSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
 
+class OrderCustomerSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=255, source='user.first_name')
+    last_name = serializers.CharField(max_length=255, source='user.last_name')
+    email = serializers.EmailField(source='user.email')
+
+    class Meta:
+        model = Customer
+        fields = ['id', 'user', 'first_name', 'last_name', 'email']
+
+
 class OrderItemProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -165,11 +175,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    customer = OrderCustomerSerializer()
     total_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'customer_id', 'items', 'total_price', 'status', 'datetime_created']
+        fields = ['id', 'customer', 'items', 'total_price', 'status', 'datetime_created']
 
     def get_total_price(self, order: Order):
         return sum([item.quantity * item.product.unit_price  for item in order.items.all()])
