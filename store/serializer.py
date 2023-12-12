@@ -173,7 +173,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return order_item.product.unit_price * order_item.quantity
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class AdminOrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     customer = OrderCustomerSerializer()
     total_price = serializers.SerializerMethodField()
@@ -184,3 +184,15 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, order: Order):
         return sum([item.quantity * item.product.unit_price  for item in order.items.all()])
+
+
+class ClientOrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'items', 'total_price', 'status', 'datetime_created']
+
+    def get_total_price(self, order: Order):
+        return sum([item.product.unit_price * item.quantity for item in order.items.all()])
