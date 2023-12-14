@@ -158,3 +158,5 @@ class OrderViewSet(ModelViewSet):
             return AdminOrderSerializer
         return ClientOrderSerializer
 
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
