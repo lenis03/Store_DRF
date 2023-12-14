@@ -196,3 +196,25 @@ class ClientOrderSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, order: Order):
         return sum([item.product.unit_price * item.quantity for item in order.items.all()])
+
+
+class OrderCreateSerializer(serializers.Serializer):
+    cart_id = serializers.UUIDField()
+
+    def validate_cart_id(self, cart_id):
+
+        if not Cart.objects.filter(id=cart_id).exists():
+            raise serializers.ValidationError('There is no cart with this cart id!')
+
+        if CartItem.objects.filter(cart_id=cart_id).count() == 0:
+            raise serializers.ValidationError('Your cart is empty. Please add some product to it first!')
+
+        return cart_id
+
+        # The second method:
+        # try:
+        #     if Cart.objects.prefetch_related('items').get(id=cart_id).items.count() == 0:
+        #         raise serializers.ValidationError('Your cart is empty. Please add some product to it first!')
+        # except Cart.DoesNotExist:
+        #     raise serializers.ValidationError('There is no cart with this cart id!')
+
