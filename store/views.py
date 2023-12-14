@@ -15,6 +15,7 @@ from .models import Cart, CartItem, Category, Comment, Customer, Order, OrderIte
 from .paginations import DefaultPagination
 from .permissions import IsAdminOrCreateAndRetrieve, IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
 from .serializer import AddCartItemSerializer, AdminOrderSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ClientOrderSerializer, CustomerSerializer, OrderCreateSerializer, OrderUpdateSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
+from .signals import order_created
 
 
 class ProductViewSet(ModelViewSet):
@@ -180,6 +181,8 @@ class OrderViewSet(ModelViewSet):
             )
         create_order_serializer.is_valid(raise_exception=True)
         created_order = create_order_serializer.save()
+        # send signal order_created with send_robust.
+        order_created.send_robust(sender=self.__class__, order=created_order)
 
         serializer = ClientOrderSerializer(created_order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

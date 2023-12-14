@@ -6,4 +6,4 @@ class StoreConfig(AppConfig):
     name = 'store'
 
     def ready(self) -> None:
-        from . import signals
+        from .signals import handlers
