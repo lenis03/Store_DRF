@@ -14,7 +14,7 @@ from .filters import ProductFilter
 from .models import Cart, CartItem, Category, Comment, Customer, Order, OrderItem, Product
 from .paginations import DefaultPagination
 from .permissions import IsAdminOrCreateAndRetrieve, IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
-from .serializer import AddCartItemSerializer, AdminOrderSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ClientOrderSerializer, CustomerSerializer, OrderCreateSerializer, OrderUpdateSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
+from .serializer import AddCartItemSerializer, AdminOrderSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ClientOrderSerializer, CustomerSerializer, OrderCreateSerializer, OrderItemSerializer, OrderUpdateSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
 from .signals import order_created
 
 
@@ -133,6 +133,20 @@ class CustomerViewSet(ModelViewSet):
     @action(detail=True, permission_classes=[SendPrivateEmailToCustomerPermission])
     def send_private_email(self, request, pk):
         return Response(f'Sending private email to customer {pk=}')
+
+
+class OrderItemViewSet(ModelViewSet):
+    http_method_names = ['get']
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        order_pk = self.kwargs['order_pk']
+        return OrderItem\
+            .objects\
+            .select_related('order', 'product')\
+            .filter(order_id=order_pk)\
+            .all()
 
 
 class OrderViewSet(ModelViewSet):
