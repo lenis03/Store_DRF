@@ -91,6 +91,13 @@ class AddCartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'product', 'quantity']
 
+    def validate_quantity(self, quantity):
+        if quantity <= 0:
+            raise serializers.ValidationError(
+                'The quantity of product must greater than or equal to 1'
+                )
+        return quantity
+
     def create(self, validated_data):
         cart_pk = self.context['cart_pk']
         product = validated_data.get('product')
