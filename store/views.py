@@ -186,3 +186,17 @@ class OrderViewSet(ModelViewSet):
 
         serializer = ClientOrderSerializer(created_order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk):
+        order = Order.objects.prefetch_related('items').get(pk=pk)
+
+        if order.items.all().count() > 0:
+            return Response({
+                'error':
+                    'There is some order items including this order.'
+                    'Please remove them first.'},
+                    status=status.HTTP_405_METHOD_NOT_ALLOWED
+                    )
+
+        order.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
