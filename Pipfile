@@ -6,7 +6,6 @@ name = "pypi"
 [packages]
 django = "*"
 django-debug-toolbar = "*"
-mysqlclient = "*"
 factory-boy = "*"
 faker = "*"
 djangorestframework = "*"
@@ -14,6 +13,8 @@ drf-nested-routers = "*"
 django-filter = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
+mysql-connector-python = "*"
+mysqlclient = "*"
 
 [dev-packages]
 

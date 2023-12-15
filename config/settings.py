@@ -93,7 +93,7 @@ DATABASES = {
         'NAME': 'store_drf',
         'HOST': 'localhost',
         'USER': 'root',
-        'PASSWORD': 'mysql',
+        'PASSWORD': '@#3921013690fr@#',
     }
 }
 
