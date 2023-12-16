@@ -142,11 +142,17 @@ class OrderItemViewSet(ModelViewSet):
 
     def get_queryset(self):
         order_pk = self.kwargs['order_pk']
-        return OrderItem\
+        user = self.request.user
+
+        queryset = OrderItem\
             .objects\
             .select_related('order', 'product')\
             .filter(order_id=order_pk)\
             .all()
+
+        if user.is_staff:
+            return queryset
+        return queryset.filter(order__customer__id=user.id)
 
 
 class OrderViewSet(ModelViewSet):
