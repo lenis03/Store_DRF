@@ -84,8 +84,16 @@ class Order(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=1, choices=ORDER_STATUS, default=ORDER_STATUS_UNPAID)
 
+    zarinpal_authority = models.CharField(max_length=255, blank=True)
+    zarinpal_ref_id = models.CharField(max_length=150, blank=True)
+    zarinpal_data = models.TextField(blank=True)
+
     objects = models.Manager()
     unpaid_orders = UnpaidOrderManager()
+
+    def get_total_price(self):
+        total = sum([item.get_cost() for item in self.items.all()])
+        return total
 
     def __str__(self):
         return f'order id: {self.id}'
@@ -99,6 +107,9 @@ class OrderItem(models.Model):
 
     class Meta:
         unique_together = [['order', 'product']]
+
+    def get_cost(self):
+        return self.unit_price * self.quantity
 
 
 class CommentManager(models.Manager):
