@@ -1,6 +1,9 @@
+import json
+from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Prefetch
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+import requests
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -9,6 +12,10 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
+from config import settings
+
+from store import zarinpal
 
 from .filters import ProductFilter
 from .models import Cart, CartItem, Category, Comment, Customer, Order, OrderItem, Product
@@ -220,3 +227,103 @@ class OrderViewSet(ModelViewSet):
 
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class OrderPayView(APIView):
+    http_method_names = ['get', 'option', 'head']
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, order_id):
+        order = get_object_or_404(Order, id=order_id)
+        request.session['order_pay'] = {
+            'order_id': order.id,
+        }
+
+        request.session['order_id'] = {
+            'order_id': int(order_id),
+        }
+
+        req_data = {
+            "MerchantID": settings.ZARINPALL_MERCHANT_ID,
+            "Amount": int(order.get_total_price() * 50000),
+            "Description": 'TechnoShop',
+            "Phone": '',
+            "CallbackURL": request.build_absolute_uri(reverse('store:order_verify')),
+        }
+
+        request_header = {
+            "accept": "application/json",
+            "content-type": "application/json"
+        }
+        res = requests.post(zarinpal.ZP_API_REQUEST, data=json.dumps(req_data), headers=request_header)
+        print(res)
+        # print(res.json()['data'])
+
+        data = res.json()
+        print(data)
+        authority = data['Authority']
+        order.zarinpal_authority = authority
+        order.save()
+
+        if 'errors' not in data or len(data['errors']) == 0:
+            return redirect(zarinpal.ZP_API_STARTPAY.format(sandbox=zarinpal.sandbox, authority=authority))
+        else:
+            print(data['errors'])
+            # Need to ckeak for order.return_products_to_cart
+            return Response({'error': 'Error from zarinpal'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+class OrderVerifyView(APIView):
+    http_method_names = ['get', 'option', 'head']
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        payment_authority = request.GET.get('Authority')
+        payment_status = request.GET.get('Status')
+
+        order = get_object_or_404(Order, zarinpal_authority=payment_authority)
+
+        if payment_status == 'OK':
+            request_header = {
+                "accept": "application/json",
+                "content-type": "application/json",
+            }
+
+            req_data = {
+                'MerchantID': settings.ZARINPALL_MERCHANT_ID,
+                'Amount': int(order.get_total_price() * 50000),
+                'Authority': payment_authority,
+            }
+
+            res = requests.post(
+                    zarinpal.ZP_API_VERIFY,
+                    data=json.dumps(req_data),
+                    headers=request_header,
+
+                )
+            if 'errors' not in res.json():
+                data = res.json()
+                payment_code = data['Status']
+
+                if payment_code == 100:
+                    order.status = 'p'
+                    order.zarinpal_ref_id = data['RefID']
+                    order.zarinpal_data = data
+                    order.save()
+                    return Response({'success': 'Your payment has been successfully completed!'}, status=status.HTTP_200_OK)
+                    # Need to ckeak for order.return_products_to_cart
+                elif payment_code == 101:
+                    return Response({'success': 'Your payment has been successfully completed.'
+                                    ' Of course, this transaction has already been registered!'}, status=status.HTTP_200_OK)
+
+                else:
+                    # Need to ckeak for order.return_products_to_cart
+                    error_code = res.json().get('errors', {}).get('code')
+                    # error_message = res.json()['errors']['message']
+                    error_message = res.json().get('errors', {}).get('message')
+                    return Response({'error': f'The transaction was unsuccessful! {error_message} {error_code} '}, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+
+            # Need to ckeak for order.return_products_to_cart
+            return Response({'error': 'The transaction was unsuccessful or canceled by user !'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
