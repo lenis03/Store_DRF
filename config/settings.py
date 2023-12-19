@@ -93,7 +93,7 @@ DATABASES = {
         'NAME': 'store_drf',
         'HOST': 'localhost',
         'USER': 'root',
-        'PASSWORD': '@#3921013690fr@#',
+        'PASSWORD': '24860036',
     }
 }
 
@@ -168,3 +168,8 @@ DJOSER = {
 # Config CustomUser
 
 AUTH_USER_MODEL = 'core.CustomUser'
+
+
+# ZarinPal
+SANDBOX = True
+ZARINPALL_MERCHANT_ID = 'aaabbbaaabbbaaabbbaaabbbaaabbbaaabbb'
