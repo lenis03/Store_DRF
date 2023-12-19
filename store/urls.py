@@ -58,6 +58,7 @@ urlpatterns = [
                 +
                 carts_router.urls
                 +
-                order_router.urls
-        )),
+                order_router.urls)),
+    path('orders/<int:order_id>/pay/', views.OrderPayView.as_view(), name='order-pay'),
+    path('orders/verify', views.OrderVerifyView.as_view(), name='order_verify')
 ]
