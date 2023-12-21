@@ -276,3 +276,51 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['status']
+
+
+class OrderToCartSeializer(serializers.Serializer):
+    order_id = serializers.IntegerField()
+
+    def validate_order_id(self, order_id: Order):
+        if not Order.objects.filter(id=order_id).exists():
+            raise serializers.ValidationError('There is no order with this order id!')
+
+        if OrderItem.objects.filter(order_id=order_id).count() == 0:
+            raise serializers.ValidationError('Your order has no items!')
+
+        if Order.objects.get(id=order_id).status in ['p', 'c']:
+            raise serializers.ValidationError('This order has been paid or'
+                                              'canceled by the customer and '
+                                              'cannot be returned to the'
+                                              'shopping cart'
+                                              )
+
+        return order_id
+
+    def save(self):
+        with transaction.atomic():
+            order_id = self.validated_data['order_id']
+
+            cart = Cart()
+            cart.save()
+
+            order_items = OrderItem.objects.select_related('product').filter(order_id=order_id)
+
+            cart_items = [
+                CartItem(
+                    cart=cart,
+                    product_id=order_item.product_id,
+                    quantity=order_item.quantity
+                ) for order_item in order_items
+            ]
+
+            CartItem.objects.bulk_create(cart_items)
+
+            order_items = [
+                OrderItem.objects.get(id=order_item.id).delete()
+                for order_item in order_items
+            ]
+
+            Order.objects.get(id=order_id).delete()
+
+            return cart
