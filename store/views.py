@@ -252,6 +252,10 @@ class OrderPayView(APIView):
 
     def get(self, request, order_id):
         order = get_object_or_404(Order, id=order_id)
+
+        if order.status == 'p':
+            return Response('This order has been paid!')
+
         request.session['order_pay'] = {
             'order_id': order.id,
         }
