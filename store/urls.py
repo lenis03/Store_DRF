@@ -51,6 +51,7 @@ order_router.register(
 # urlpatterns = router.urls + products_router.urls
 
 urlpatterns = [
+    path('orders/return_to_cart/', views.OrderToCartView.as_view(), name='order_to_cart'),
     path('', include(
                 router.urls
                 +

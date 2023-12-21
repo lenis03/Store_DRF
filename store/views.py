@@ -21,7 +21,7 @@ from .filters import ProductFilter
 from .models import Cart, CartItem, Category, Comment, Customer, Order, OrderItem, Product
 from .paginations import DefaultPagination
 from .permissions import IsAdminOrCreateAndRetrieve, IsAdminOrReadOnly, SendPrivateEmailToCustomerPermission
-from .serializer import AddCartItemSerializer, AdminOrderSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ClientOrderSerializer, CustomerSerializer, OrderCreateSerializer, OrderItemSerializer, OrderUpdateSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
+from .serializer import AddCartItemSerializer, AdminOrderSerializer, CartItemSerializer, CartSerializer, CategorySerializer, ClientOrderSerializer, CustomerSerializer, OrderCreateSerializer, OrderItemSerializer, OrderToCartSeializer, OrderUpdateSerializer, ProductSerializer, CommentSerializer, UpdateCartItemSerializer
 from .signals import order_created
 
 
@@ -227,6 +227,23 @@ class OrderViewSet(ModelViewSet):
 
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class OrderToCartView(APIView):
+    http_method_names = ['get', 'post']
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        return Response('Please enter your order id to return your order to cart!')
+
+    def post(self, request):
+        order_to_cart_serializer = OrderToCartSeializer(data=request.data)
+        order_to_cart_serializer.is_valid(raise_exception=True)
+        new_cart = order_to_cart_serializer.save()
+
+        serializer = CartSerializer(new_cart)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class OrderPayView(APIView):
