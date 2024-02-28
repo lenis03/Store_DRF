@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'debug_toolbar',
+    'drf_spectacular',
     # Local Apps
     'store.apps.StoreConfig',
     'core.apps.CoreConfig',
@@ -138,7 +139,8 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # djangorestframework_simplejwt config
@@ -155,6 +157,14 @@ DJOSER = {
         'user_create': 'core.serializers.UserCreateSerializer',
         'current_user': 'core.serializers.UserSerializer',
     }
+}
+
+# Config for drf-spectacular
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Shop Rest',
+    'DESCRIPTION': 'Everything you need for a store!',
+    'VERSION': '1.0.0',
 }
 
 # Config CustomUser
